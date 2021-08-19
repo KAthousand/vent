@@ -14,14 +14,15 @@ export const getAll = <T>(model: EntityTarget<T>) =>
 // pass the optional param of sortBy (which field of the entity you would like to sort by), and sortDirection.
 // define the return type as a promise object that contains items (an array), and total (the total number of results)
 async ( 
-    sortBy?: EntityFieldsNames<T>,
+    sortBy?: EntityFieldsNames,
     sortDirection: SortDirection = 'DESC'
     // sortDirection cannot be defined as nullable because when we defined it the accetable values are 'ASC' | 'DESC'
   ):Promise<{ items: T[], total: number}> => {
     // define the entity manager 
+    console.log()
     const entityManager = getManager()
     // define an options object (with the type FindManyOptions) to use the different typeORM findmany() query builder options
-    const options: FindManyOptions<T> = {}
+    const options: FindManyOptions = {}
     // if sortBy was passed...
     if (sortBy) {
       // options.order is defined as an empty object... 
