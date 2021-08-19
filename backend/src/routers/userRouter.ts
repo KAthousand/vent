@@ -2,8 +2,10 @@
 import { doAsync } from "../utils/doAsync";
 import { Router } from 'express';
 import { body } from "express-validator";
-import { getUser, getAllUsers, createUser } from "../services/userService";
+import { getUser, getAllUsers, createUser, loginUser } from "../services/userService";
 import {Request} from 'express'
+import { SortDirection } from "../types/sortDirection";
+import { EntityFieldsNames } from "typeorm/common/EntityFieldsNames";
 
 // define routes to manage users
 
@@ -40,7 +42,7 @@ userRouter.get(
   // define the url (further defined in router config)
   '/', 
   // normal controller setup, use doAsync util, then use getAllUsers function
-  async (req, res, next) => doAsync(req, res, next, getAllUsers()))
+  async (req, res, next) => doAsync(req, res, next, getAllUsers(<EntityFieldsNames>req.query.sortBy, <SortDirection>req.query.sortDirection)))
 
 // GET one user by id
 // "/users/:id"
@@ -93,3 +95,9 @@ userRouter.post(
 )
 
 // http://localhost:8082/users?sortBy=createdDateTime&sortDirection=DESC
+
+
+userRouter.post(
+  '/login',
+  (req, res, next) => doAsync(req, res, next, loginUser(req.body))
+  )

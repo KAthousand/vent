@@ -28,7 +28,7 @@ const setupDatabase = (typeormModule: typeof typeorm) => {
       migrations: ['build/db/migration/*.js'],
       synchronize: isDebugMode,
       migrationsRun: true,
-      logging: isDebugMode,
+      // logging: isDebugMode,
     })
 
     console.log('Connected to database successfully!')

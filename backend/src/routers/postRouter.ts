@@ -4,7 +4,8 @@ import { Router } from 'express';
 import { body } from "express-validator";
 import { getPost, getAllPosts, createPost } from "../services/postService";
 import {Request} from 'express'
-
+import { EntityFieldsNames } from "typeorm/common/EntityFieldsNames";
+import { SortDirection } from "../types/sortDirection";
 // define routes to manage posts
 
 // Post:
@@ -40,7 +41,7 @@ postRouter.get(
   // define the url (further defined in router config)
   '/', 
   // normal controller setup, use doAsync util, then use getAllPosts function
-  async (req, res, next) => doAsync(req, res, next, getAllPosts()))
+  async (req, res, next) => doAsync(req, res, next, getAllPosts(<EntityFieldsNames>req.query.sortBy, <SortDirection>req.query.sortDirection)))
 
 // GET one post by id
 // "/posts/:id"
@@ -91,4 +92,3 @@ postRouter.post(
   // normal controller setup, use doAsync util, then use createPost function with express-validated body.
   (req, res, next) => doAsync(req, res, next, createPost(req.body))
 )
-
