@@ -1,0 +1,14 @@
+{
+  "name": "frontend",
+  "version": "0.0.1",
+  "description": "Vue frontend, utilizing vuex, vuetify to create a UI.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vue/cli": "^4.5.13"
+  }
+}
