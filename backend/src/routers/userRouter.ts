@@ -3,7 +3,6 @@ import { doAsync } from "../utils/doAsync";
 import { Router } from 'express';
 import { body } from "express-validator";
 import { getUser, getAllUsers, createUser } from "../services/userService";
-import { EntityFieldsNames } from "typeorm/common/EntityFieldsNames";
 import {Request} from 'express'
 
 // define routes to manage users
@@ -92,3 +91,5 @@ userRouter.post(
   // normal controller setup, use doAsync util, then use createUser function with express-validated body.
   (req, res, next) => doAsync(req, res, next, createUser(req.body))
 )
+
+// http://localhost:8082/users?sortBy=createdDateTime&sortDirection=DESC
