@@ -1,20 +1,20 @@
 // imports
 // express imports and middleware
-import { Router, Express } from 'express'
-import express from 'express'
-import cors from 'cors'
-import logger from 'morgan'
-import { json } from 'body-parser'
-import typeorm from 'typeorm'
-import {env} from './env'
-import cookieParser from 'cookie-parser'
+import { Router, Express } from 'express';
+import express from 'express';
+import cors from 'cors';
+import logger from 'morgan';
+import { json } from 'body-parser';
+import typeorm from 'typeorm';
+import { env } from './env';
+import cookieParser from 'cookie-parser';
 
-type RouteConfig = {route: string; router: Router}
+type RouteConfig = { route: string; router: Router };
 
-type AppConfig = {routeConfigs: RouteConfig[]}
+type AppConfig = { routeConfigs: RouteConfig[] };
 
 const setupDatabase = (typeormModule: typeof typeorm) => {
-  const isDebugMode = env.isDevMode()
+  const isDebugMode = env.isDevMode();
 
   try {
     typeormModule.createConnection({
@@ -29,55 +29,55 @@ const setupDatabase = (typeormModule: typeof typeorm) => {
       synchronize: isDebugMode,
       migrationsRun: true,
       // logging: isDebugMode,
-    })
+    });
 
-    console.log('Connected to database successfully!')
+    console.log('Connected to database successfully!');
   } catch (error) {
-    console.error(error, 'An error occurred connecting to the database')
+    console.error(error, 'An error occurred connecting to the database');
   }
-}
+};
 
 const setupExpressRoutes = (app: Express, config: AppConfig) => {
-  config.routeConfigs.forEach((routeConfig)=>{
-    app.use(`${env.get('BASE_PATH')}${routeConfig.route}`, routeConfig.router)
-  })
-}
+  config.routeConfigs.forEach((routeConfig) => {
+    app.use(`${env.get('BASE_PATH')}${routeConfig.route}`, routeConfig.router);
+  });
+};
 
 const setupServer = (config: AppConfig) => {
-  const app = express()
-  app.use(json())
+  const app = express();
+  app.use(json());
   app.use(
     cors({
       origin: env.get('CORS_ORIGIN'),
       credentials: true,
-    })
-  )
-  app.use(cookieParser())
-  app.use(logger('dev'))
-  setupExpressRoutes(app, config)
+    }),
+  );
+  app.use(cookieParser());
+  app.use(logger('dev'));
+  setupExpressRoutes(app, config);
 
   const server = app.listen(env.get('PORT'), () => {
-    console.log(`Server running on port: ${env.get('PORT')}`)
-  })
-  return {app, server}
-}
+    console.log(`Server running on port: ${env.get('PORT')}`);
+  });
+  return { app, server };
+};
 
 const initEnv = () => {
   try {
-    env.init()
+    env.init();
   } catch (error) {
-    console.error('An error occurred during Environment Initialization:', error)
+    console.error('An error occurred during Environment Initialization:', error);
   }
-}
+};
 
-export const setupApp = async ( typeormModule: typeof typeorm, config: AppConfig) => {
-  initEnv()
+export const setupApp = async (typeormModule: typeof typeorm, config: AppConfig) => {
+  initEnv();
   try {
-    setupDatabase(typeormModule)
-    const {app, server} = setupServer(config)
+    setupDatabase(typeormModule);
+    const { app, server } = setupServer(config);
 
-    return {app, server}
+    return { app, server };
   } catch (error) {
-    console.error('An error occurred during setupApp', error)
+    console.error('An error occurred during setupApp', error);
   }
-}
+};

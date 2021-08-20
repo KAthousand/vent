@@ -1,13 +1,13 @@
-import { createOne } from "../utils/createOne";
-import { getAll } from "../utils/getAll";
-import { getById } from "../utils/getById";
-import User from "../db/entity/User";
-import { findByField } from "../utils/login";
+import { getAll } from '../utils/getAll';
+import { getById } from '../utils/getById';
+import { register } from '../utils/register';
+import { login } from '../utils/login';
+import User from '../db/entity/User';
 
-export const getAllUsers = getAll(User)
+export const getAllUsers = getAll(User);
 
-export const createUser = createOne(User)
+export const getUser = getById(User);
 
-export const getUser = getById(User)
+export const loginUser = login(User);
 
-export const loginUser = findByField(User)
+export const registerUser = register(User);

@@ -4,4 +4,4 @@
 // params are the model you are trying to save the record to.
 // ex.
 // const updateUser = updateOne(User)
-// const updatedUser = await updateUser({...}) 
+// const updatedUser = await updateUser({...})

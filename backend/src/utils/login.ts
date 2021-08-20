@@ -1,94 +1,59 @@
-import { WSAEHOSTUNREACH } from "constants";
-import { report } from "process";
-import { DeepPartial, EntityTarget, FindConditions, FindOneOptions, getConnection, getManager, getRepository, ObjectLiteral} from "typeorm";
-import { EntityFieldsNames } from "typeorm/common/EntityFieldsNames";
-import User from "../db/entity/User";
-import { userRouter } from "../routers/userRouter";
-import { comparePass } from "./auth";
+import { EntityTarget, FindOneOptions, getManager } from 'typeorm';
+import { comparePass, generateToken } from './auth';
+
+import { UserPostBody } from '../types/UserPostBody';
 
 type inputRecord = {
-  account: string,
-  password: string
-}
+  account: string;
+  password: string;
+};
 
-export type UserRecord = {
-  id: string
-  createdDateTime: Date
-  updatedDateTime: Date
-  deletedDateTime: Date
-  version: number
-  account: string
-  displayName: string
-  password: string
-}
+export const login =
+  <T>(model: EntityTarget<T>) =>
+  // async <T>(inputRecord: {account: string, password: string}): Promise<T[]> => {
+  async (inputRecord: inputRecord) => {
+    // const account = inputRecord as unknown as T;
+    const account = { account: inputRecord.account } as unknown as T;
+    const entityManager = getManager();
+    const options: FindOneOptions = {};
+    options.select = ['account', 'password'];
+    const user = await entityManager.findOneOrFail(model, account, options);
+    if (user === null) {
+      throw new Error('Cannot find user');
+    }
+    try {
+      const passwordMatch = await comparePass(inputRecord.password, user.password);
+      if (passwordMatch) {
+        const accessToken = generateToken({ ...user });
+        return { accessToken: accessToken };
+      } else {
+        throw new Error('Incorrect Account Name or Password');
+      }
+    } catch (error) {
+      throw new Error(`An error occured while checking credentials: ${error}`);
+    }
+  };
 
+// find One or Fail
+// (method) EntityManager.findOneOrFail<T>(entityClass: EntityTarget<T>, id?: string | number | Date | ObjectID | undefined, options?: FindOneOptions<T> | undefined): Promise<...> (+2 overloads)
 
-export const findByField = <T>(model: EntityTarget<T>) =>
-  async (account: string) => {
-    const entityManager = getManager()
-    const options: FindOneOptions = {}
-    options.select = ['account', 'password']
-    const user = await entityManager.findOneOrFail(model, account, options)
-    console.log('hello')
-    return user
-
-    // const user = await getRepository(model)
-    // .createQueryBuilder("user")
-    // .where("user.account = :account", {account: account})
-    // .addSelect("user.password")
-    // .getOne()
-    // if (user === null){
-    //   throw new Error ('Cannot find user')
-    // }
-    // try {
-    //   const passwordMatch = comparePass(password, user.password)
-    // } catch (error) {
-    // }
-  }
-
-  // find One or Fail
-  // (method) EntityManager.findOneOrFail<T>(entityClass: EntityTarget<T>, id?: string | number | Date | ObjectID | undefined, options?: FindOneOptions<T> | undefined): Promise<...> (+2 overloads)
-
-// get repo 
+// get repo
 // (alias) getRepository<T>(entityClass: EntityTarget<T>, connectionName?: string | undefined): Repository<T>
 // import getRepository
 
-// create q builder 
+// create q builder
 // (method) Repository<T>.createQueryBuilder(alias?: string | undefined, queryRunner?: QueryRunner | undefined): SelectQueryBuilder<T>
 
-// Where 
+// Where
 // (method) SelectQueryBuilder<T>.where(where: string | Brackets | ObjectLiteral | ObjectLiteral[] | ((qb: SelectQueryBuilder<T>) => string), parameters?: ObjectLiteral | undefined): SelectQueryBuilder<...>
 
-// addSelect 
+// addSelect
 // (method) SelectQueryBuilder<T>.addSelect(selection: string, selectionAliasName?: string | undefined): SelectQueryBuilder<T> (+2 overloads)
 
-// getOne 
+// getOne
 // (method) SelectQueryBuilder<T>.getOne(): Promise<T | undefined>
 
-
 //   findOneOrFail<T extends Array<keyof Entity>>(id?: string | number | Date | ObjectID, options?: FindOneOptions<Entity> & { select: T }): Promise<Pick<Entity, T[number]>>;
-// export const loginUsers = async (req: Request, res: Response) => {
-//   const user = await getRepository(User)
-//   .createQueryBuilder("user")
-//   .where( "user.username = :username", {username: req.body.username})
-//   .addSelect('user.passwordHash')
-//   .getOne()
-//   if (user == null) {
-//     return res.status(400).send("Cannot find user")
-//   }
-//   try {
-//     const passwordMatch = await comparePass(req.body.passwordHash, user.passwordHash)
-//     if (passwordMatch) {
-//       const accessToken = generateToken({...user})
-//       res.status(200)
-//       res.json({accessToken: accessToken})
-//     } else {
-//       res.status(401).send("Incorrect Email or Password")
-//     }
-//   } catch (error) {
-//     return res.status(500).send(error.message)
-//   }
-// }
 
 // userRepository.find({ where: { firstName: "Timber", lastName: "Saw" } });
 
@@ -102,3 +67,5 @@ export const findByField = <T>(model: EntityTarget<T>) =>
 //   await this.manager.update(OfferedClass, code, offeredClass);
 // return code;
 // }
+
+const example = { account: 'flapjack', password: '123456' };

@@ -1,18 +1,17 @@
 //imports
-import { Column, Entity } from "typeorm";
+import { Column, Entity } from 'typeorm';
 // import model to extend from
-import Model from "./Model";
+import Model from './Model';
 
 // Define the entity
 @Entity('posts')
-
-export default class Post extends Model{
+export default class Post extends Model {
   @Column()
   title!: string;
 
   @Column()
-  content!: string
+  content!: string;
 
   @Column()
-  userId!: string
+  userId!: string;
 }
